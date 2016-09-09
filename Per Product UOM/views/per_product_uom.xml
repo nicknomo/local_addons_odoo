@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <act_window
+      id="per_product_uom_action"
+      name="Per Product UOM"
+      res_model="productuom.class" />
+
+    <menuitem
+      id="per_product_uom_menu"
+      name="Product UOM Convserion"
+      action="per_product_uom_action"
+      parent=""
+      />
+
+
+</data>
+</openerp>
