@@ -27,7 +27,7 @@ class local_product_uom(models.Model):
         uom_categ = self.pool.get('productuom.class')
         values = {self._rec_name: name, 'factor': 1}
         # look for the category based on the english name, i.e. no context on purpose!
-        # TESt2
+        # New BETA
         if not context.get('default_category_id'):
             categ_misc = 'Unsorted/Imported Units'
             categ_id = uom_categ.search(cr, uid, [('name', '=', categ_misc)])
