@@ -5,3 +5,5 @@
 *.pyo
 *~
 .git
+vcs.xml
+.idea
