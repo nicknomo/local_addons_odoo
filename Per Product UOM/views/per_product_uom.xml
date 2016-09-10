@@ -5,7 +5,7 @@
     <act_window
       id="per_product_uom_action"
       name="Per Product UOM"
-      res_model="productuom.class" />
+      res_model="localproduct.uom" />
 
     <menuitem
       id="per_product_uom_menu"
