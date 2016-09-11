@@ -2,18 +2,164 @@
 <openerp>
   <data>
 
+
+    <record id="localproduct_uom_tree_view" model="ir.ui.view">
+        <field name="name">localproduct.uom.tree</field>
+        <field name="model">localproduct.uom</field>
+        <field name="arch" type="xml">
+            <tree string="Units of Measure" default_order="category_id">
+                <field name="category_id"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="localproduct_uom_search_view" model="ir.ui.view">
+        <field name="name">localproduct.uom.search</field>
+        <field name="model">localproduct.uom</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="category_id"/>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+
+    <record id="localproduct_uom_form_view" model="ir.ui.view">
+        <field name="name">localproduct.uom.form</field>
+        <field name="model">localproduct.uom</field>
+        <field name="arch" type="xml">
+            <form string="Units of Measure">
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="category_id" />
+                        <field name="uom_type" on_change="onchange_type(uom_type)"/>
+                        <field name="factor"
+                                digits="[42,5]"
+                                attrs="{'invisible':[('uom_type','!=','smaller')],
+                                        'readonly':[('uom_type','=','bigger')]}"/>
+                        <field name="factor_inv"
+                                digits="[42,5]"
+                                attrs="{'invisible':[('uom_type','!=','bigger')],
+                                        'readonly':[('uom_type','!=','bigger')]}"/>
+                        <p attrs="{'invisible':[('uom_type','!=','smaller')]}" class="oe_grey" colspan="2">
+                                e.g: 1 * (reference unit) = ratio * (this unit)
+                        </p>
+                        <p attrs="{'invisible':[('uom_type','!=','bigger')]}" class="oe_grey" colspan="2">
+                                e.g: 1 * (this unit) = ratio * (reference unit)
+                        </p>
+                    </group>
+                    <group>
+                        <field name="active"/>
+                        <field name="rounding" digits="[42, 5]"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="localproduct_uom_form_action" model="ir.actions.act_window">
+         <field name="name">Units of Measure</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">localproduct.uom</field>
+         <field name="view_type">form</field>
+         <field name="view_id" ref="localproduct_uom_tree_view"/>
+         <field name="help" type="html">
+             <p class="oe_view_nocontent_create">Click to add a new unit of measure.</p>
+             <p>
+                You must define a conversion rate between several Units of
+                Measure within the same UoM conversion class.
+             </p>
+         </field>
+    </record>
+
+    <record id="productuom_class_tree_view" model="ir.ui.view">
+        <field name="name">productuom.class.tree</field>
+        <field name="model">productuom.class</field>
+        <field name="arch" type="xml">
+            <tree string="UoM Conversion Classes" default_order="name">
+                <field name="name"/>
+                <field name="localuom"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="productuom_class_form_action" model="ir.actions.act_window">
+         <field name="name">UoM Conversion Class</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">productuom.class</field>
+         <field name="view_type">form</field>
+         <field name="view_id" ref="productuom_class_tree_view"/>
+         <field name="help" type="html">
+             <p class="oe_view_nocontent_create">Click to add a new conversion class.</p>
+             <p>
+                You must define a conversion class to hold units of measure.
+             </p>
+         </field>
+    </record>
+
     <act_window
-      id="per_product_uom_action"
-      name="Per Product UOM"
-      res_model="localproduct.uom" />
+      id="productuom_class_action"
+      name="Product UOM class"
+      res_model="productuom.class" />
+
+
+     <act_window
+     id="localproduct_uom_action"
+     name="Local UOM Entries"
+     res_model="localproduct.uom" />
 
     <menuitem
       id="per_product_uom_menu"
       name="Product UOM Convserion"
-      action="per_product_uom_action"
       parent=""
       />
 
+      <menuitem
+      id="per_product_uom_class"
+      name="Product UOM Class"
+      action="productuom_class_form_action"
+      parent="per_product_uom_menu"
+      />
+
+      <menuitem
+      id="localproduct_uom_entries"
+      name="Local UOM Entries"
+      action="localproduct_uom_form_action"
+      parent="per_product_uom_menu"
+      />
+
+     <record id="product_template_form_view_inherit_product_uomconv" model="ir.ui.view">
+            <field name="name">product.template.common.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//field[@name='uom_po_id']" position="after">
+                     <field name="uom_class" context="{'template_id': id}">
+                         <tree delete='false' create='false' >
+                             <field name="name"/>
+                         </tree>
+                     </field>
+
+                </xpath>
+
+                <notebook>
+                    <page string="Uom Conv." name="uomconv">
+                        <group>
+                            <field name="uom_class" context="{'template_id': id}">
+                                <tree delete='false' create='false'  >
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </group>
+                        </page>
+                </notebook>
+
+
+            </field>
+     </record>
 
 </data>
 </openerp>
