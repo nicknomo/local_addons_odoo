@@ -7,47 +7,54 @@ import openerp.addons.product.product as native_product
 
 
 class local_product_uom(models.Model):
-    _inherit = "product.uom"
+    _inherits = {'product.uom':'uid', }
     _name = "localproduct.uom"
-    #_parent_store = True
-    #_parent_name = 'category_id'
-    #parent_left = fields.Integer('Parent Left',index=True)
-    #parent_right = fields.Integer('Parent Right', index=True)
-    uom_sell = fields.Boolean('Sellable?', change_default=True)
+    uid = fields.Many2one('product.uom', ondelete='cascade', required=True)
+    #This references the conversion class this product belongs to
+    localcategory_id = fields.Many2one('productuom.class', 'Unit of Measure Conversion Class', required=True, ondelete='cascade', help="Conversion between Units of Measure can only occur if they belong to the same category. The conversion will be made based on the ratios.")
 
-    name = fields.Char('Unit of Measure', required=True, translate=True)
-    category_id = fields.Many2one('productuom.class', 'Unit of Measure Conversion Class', required=True, ondelete='cascade', help="Conversion between Units of Measure can only occur if they belong to the same category. The conversion will be made based on the ratios.")
 
-    _sql_constraints = [('factor_gt_zero', 'CHECK (factor!=0)', 'The conversion ratio for a unit of measure cannot be 0!'), ('uom_uniq','UNIQUE (name,category_id)','Only one entry for that UOM per category')    ]
+    #Here we automatically compute the normal UoM category, base on the conversion class.  The normal UoM category is part of the conversion class, so its easy to reference.
+    @api.onchange('localcategory_id')
+    def onchange_localcategory_id(self):
+        self.category_id = self.localcategory_id.catid
 
-    def name_create(self, cr, uid, name, context=None):
-        """ The UoM category and factor are required, so we'll have to add temporary values
-            for imported UoMs """
-        if not context:
-            context = {}
-        uom_categ = self.pool.get('productuom.class')
-        values = {self._rec_name: name, 'factor': 1}
-        # look for the category based on the english name, i.e. no context on purpose!
-        # TODO: should find a way to have it translated but not created until actually used
-        if not context.get('default_category_id'):
-            categ_misc = 'Unsorted/Imported Units'
-            categ_id = uom_categ.search(cr, uid, [('name', '=', categ_misc)])
-            if categ_id:
-                values['category_id'] = categ_id[0]
-            else:
-                values['category_id'] = uom_categ.name_create(
-                    cr, uid, categ_misc, context=context)[0]
-        uom_id = self.create(cr, uid, values, context=context)
-        return self.name_get(cr, uid, [uom_id], context=context)[0]
+    def onchange_type(self, cursor, user, ids, value):
+        if value == 'reference':
+            return {'value': {'factor': 1, 'factor_inv': 1}}
+        return {}
+
+
+
+
+class overloadproduct_uom(models.Model):
+    _inherit = 'product.uom'
+    #this lets us know if the UoM is sellable
+    uom_sell = fields.Boolean('Sellable?', default=True)
+    #this will be a hidden field that lets us filter our product specific UoM's from the normal UoM's
+    islocaluom = fields.Boolean('Is a product uom?', default=False)
+    #We need to make sure the name and category are unique, so we add SQL constraints
+    _sql_constraints = [
+        ('factor_gt_zero', 'CHECK (factor!=0)', 'The conversion ratio for a unit of measure cannot be 0!'),
+        ('uom_uniq', 'UNIQUE (name,category_id)', 'Only one entry for that UOM per category')]
+
+class overloaduom_category(models.Model):
+    _inherit = 'product.uom.categ'
+    #this will be a hidden field that lets us filter our UoM Conversion Categories from the normal UoM categories
+    isuomclass = fields.Boolean('Is a UoM Class?', default=False)
+    #We cannot allow duplicate names.  Odoo doesn't normally do this check, but it probably should.
+    _sql_constraints = [('name_uniq', 'UNIQUE (name)', 'Product UOM Conversion Class must be unique.')]
 
 
 class product_uom_class(models.Model):
+    _inherits = {'product.uom.categ':'catid'}
     _name = 'productuom.class'
-    name = fields.Char('Name', required=True, translate=True)
-    #child_ids = fields.One2many('localproduct.uom','category_id','Marker')
-    localuom = fields.One2many('localproduct.uom', 'category_id', 'Per Product Unit of Measure', required=False, help="Unit of Measure used for this products stock operation.")
+    catid = fields.Many2one('product.uom.categ', ondelete='cascade', required=True)
+    #this lets us reference our product specific UoMs from the conversion class.
+    localuom = fields.One2many('localproduct.uom', 'localcategory_id', 'Per Product Unit of Measure', required=False, help="Unit of Measure used for this products stock operation.")
 
-    _sql_constraints = [('name_uniq','UNIQUE (name)','Product UOM Conversion Class must be unique.')]
+
+    #TODO: Delete records of children
 
 
 class ProductTemplate(models.Model):
