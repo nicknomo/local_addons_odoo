@@ -198,7 +198,7 @@
     <record model="ir.actions.act_window" id="product_uom_categ_form_action" >
         <field name="name">Units Of Measurement2</field>
         <field name="res_model">product.uom.categ</field>
-        <field name="domain">[("isuomclass","=",True)]</field>
+        <field name="domain">[("isuomclass","=",False)]</field>
         <field name="view_mode">tree,form</field>
     </record>
 
@@ -214,7 +214,7 @@
     <record model="ir.actions.act_window" id="uom_list_action_override">
         <field name="name">Units Of Measurement2</field>
         <field name="res_model">product.uom</field>
-        <field name="domain">[("islocaluom","=",True)]</field>
+        <field name="domain">[("islocaluom","=",False)]</field>
         <field name="view_mode">tree,form</field>
     </record>
 
