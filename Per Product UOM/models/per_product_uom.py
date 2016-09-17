@@ -13,6 +13,11 @@ class local_product_uom(models.Model):
     #This references the conversion class this product belongs to
     localcategory_id = fields.Many2one('productuom.class', 'Unit of Measure Conversion Class', required=True, ondelete='cascade', help="Conversion between Units of Measure can only occur if they belong to the same category. The conversion will be made based on the ratios.")
 
+    #We need to delete the corresponding records in product.uom. overriding unlink() lets us do that.
+    @api.multi
+    def unlink(self):
+        self.uid.unlink()
+        return super(local_product_uom, self).unlink()
 
     #Here we automatically compute the normal UoM category, base on the conversion class.  The normal UoM category is part of the conversion class, so its easy to reference.
     @api.onchange('localcategory_id')
@@ -49,14 +54,55 @@ class overloaduom_category(models.Model):
 class product_uom_class(models.Model):
     _inherits = {'product.uom.categ':'catid'}
     _name = 'productuom.class'
+    test = fields.Boolean('isbool',default=True)
     catid = fields.Many2one('product.uom.categ', ondelete='cascade', required=True)
     #this lets us reference our product specific UoMs from the conversion class.
     localuom = fields.One2many('localproduct.uom', 'localcategory_id', 'Per Product Unit of Measure', required=False, help="Unit of Measure used for this products stock operation.")
 
+    @api.multi
+    def unlink(self):
+        self.catid.unlink()
+        return super(product_uom_class, self).unlink()
 
-    #TODO: Delete records of children
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
-    uom_class = fields.Many2one('productuom.class', 'Per Product UOM Conversion Class', required=False, help="Unit of Measure class for Per Product UOM")
+    uom_class = fields.Many2one('productuom.class', 'Per Product UOM Conversion Class', ondelete='restrict',required=False, help="Unit of Measure class for Per Product UOM")
+
+
+    @api.onchange('uom_class')
+    def onchange_uom_class(self):
+
+        if (self.uom_class.catid.isuomclass == False):
+            result = {'domain': {'uom_id': [('islocaluom', '=', False)], 'uom_po_id': [('islocaluom', '=', False)]}}
+            self.uom_id = False
+            self.uom_po_id = False
+
+        else:
+            result = { 'domain':{'uom_id':[('islocaluom','=',True),('category_id.name','=',self.uom_class.name)],'uom_po_id':[('islocaluom','=',True),('category_id.name','=',self.uom_class.name)]}}
+            records = self.env['product.uom'].search([('category_id.name','=',self.uom_class.name),('name','=',self.uom_id.name)],limit=1)
+            if records:
+                self.uom_id = records[0]
+            else:
+                self.uom_id = False
+
+            records = self.env['product.uom'].search([('category_id.name', '=', self.uom_class.name), ('name', '=', self.uom_po_id.name)], limit=1)
+            if records:
+                self.uom_po_id = records[0]
+            else:
+                self.uom_po_id = False
+
+
+
+
+
+
+
+        return result
+
+
+
+
+
+
