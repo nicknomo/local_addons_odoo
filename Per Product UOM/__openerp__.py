@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'NEW per product UOM',
-    'depends': ['product'],
+    'depends': ['product','sale'],
     'data': ['views/per_product_uom.xml'],
 }
