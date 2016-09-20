@@ -160,7 +160,8 @@ class ProductTemplate(models.Model):
 
 
 
-
+# For some reason, odoo's views had trouble finding the category of the uom in sale.order.line on the fly
+# This keeps the record in the DB, and allows me to filter UOM categories.
 class NewSaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
     #These computed fields are for calculating the domain on a form edit
