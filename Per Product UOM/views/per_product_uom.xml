@@ -240,19 +240,28 @@
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
                  <field name="uom_po_id" position="after" >
+                     <!-- calcislocaluom and calcatidname are stored computed fields.  The fields help establish a dynamic domain that can be loaded without onchange -->
                      <field name="uom_class" options="{'no_create' : True},{'no_create_edit' : True}"  />
+                     <field name="calcislocaluom" invisible="1" />
+                     <field name="calccatidname" invisible="1" />
                 </field>
 
                 <field name="uom_id" position="replace">
-                    <field name="uom_id" groups="product.group_uom" domain="[('islocaluom','=',False)]" options="{'no_create' : True},{'no_create_edit' : True}" />
+                    <!-- This domain is black voodoo magic.  The category_id.name is really only used to filter when islocaluom=True. This is a dirty hack.
+                        The result is that if a uom_class is used, only uom's from that class can be selected.  Otherwise, the default uom's are present -->
+
+                    <field name="uom_id" groups="product.group_uom" domain="['&amp;',('islocaluom','=',calcislocaluom),'|',('islocaluom','=',False),('category_id','=',calccatidname)]" options="{'no_create' : True},{'no_create_edit' : True}" />
                 </field>
 
                 <field name="uom_po_id" position="replace">
-                    <field name="uom_po_id" groups="product.group_uom" domain="[('islocaluom','=',False)]" options="{'no_create' : True},{'no_create_edit' : True}" />
+                    <!-- This domain is black voodoo magic.  The category_id.name is really only used to filter when islocaluom=True. This is a dirty hack.
+                        The result is that if a uom_class is used, only uom's from that class can be selected.  Otherwise, the default uom's are present -->
+                    <field name="uom_po_id" groups="product.group_uom" domain="['&amp;',('islocaluom','=',calcislocaluom),'|',('islocaluom','=',False),('category_id','=',calccatidname)]" options="{'no_create' : True},{'no_create_edit' : True}" />
                 </field>
 
             </field>
      </record>
+
 
 </data>
 </openerp>
