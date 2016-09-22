@@ -2,5 +2,5 @@
 {
     'name': 'NEW per product UOM',
     'depends': ['product','sale'],
-    'data': ['views/per_product_uom.xml'],
+    'data': ['views/per_product_uom.xml','views/sales.xml'],
 }
