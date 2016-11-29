@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <!-- This Sets the tree view for our Product Specific Pricelists. The category is listed first, because its more relevant for our purpose -->
+    <record id="perproduct_pricelist_tree_view" model="ir.ui.view">
+        <field name="name">perproduct.pricelist.tree</field>
+        <field name="model">perproduct.pricelist</field>
+        <field name="arch" type="xml">
+            <tree string="Price Lists" default_order="priceclass">
+                <field name="priceclass"/>
+                <field name="name"/>
+                <field name="price"/>
+                <field name="uomname"/>
+            </tree>
+        </field>
+    </record>
+
+      <!-- This Sets the Search view for our Product Specific UoMs -->
+    <record id="perproduct_pricelist_search_view" model="ir.ui.view">
+        <field name="name">perproduct.pricelist.search</field>
+        <field name="model">perproduct.pricelist</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="priceclass"/>
+                <field name="name"/>
+                <field name="price"/>
+                <field name="uomname"/>
+            </search>
+        </field>
+    </record>
+
+
+      <!-- This Sets the form view for our Product Specific UoMs -->
+    <record id="perproduct_pricelist_form_view" model="ir.ui.view">
+        <field name="name">perproduct.pricelist.form</field>
+        <field name="model">perproduct.pricelist</field>
+        <field name="arch" type="xml">
+            <form string="Price Lists">
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="priceclass" options="{'no_create' : True},{'no_create_edit' : True}" />
+                        <field name="price"/>
+                        <field name="uomname"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+      <!-- This is the action window for our product specific UoM views-->
+    <record id="perproduct_pricelist_form_action" model="ir.actions.act_window">
+         <field name="name">Price Lists</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">perproduct.pricelist</field>
+         <field name="view_type">form</field>
+         <field name="view_id" ref="perproduct_pricelist_tree_view"/>
+         <field name="help" type="html">
+             <p class="oe_view_nocontent_create">Click to add a new price list</p>
+             <p>
+                Define Price Lists based on Price Classes
+             </p>
+         </field>
+    </record>
+
+      <!-- This is the form view for the UoM conversion class-->
+    <record id="perproduct_priceclass_form_view" model="ir.ui.view">
+        <field name="name">perproduct.priceclass.form</field>
+        <field name="model">perproduct.priceclass</field>
+        <field name="arch" type="xml">
+            <form string="Price Classes" default_order="name">
+                <group>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="pricelists" readonly="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+      <!-- This is the tree view for the UoM conversion class-->
+    <record id="perproduct_priceclass_tree_view" model="ir.ui.view">
+        <field name="name">perproduct.priceclass.tree</field>
+        <field name="model">perproduct.priceclass</field>
+        <field name="arch" type="xml">
+            <tree string="Price Classes" default_order="name">
+                <field name="name"/>
+                <field name="pricelists"/>
+
+            </tree>
+        </field>
+    </record>
+
+      <!-- This is the action window we'll use on the menu for the UoM conversion class-->
+    <record id="perproduct_priceclass_form_action" model="ir.actions.act_window">
+         <field name="name">Price Classes</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">perproduct.priceclass</field>
+         <field name="view_type">form</field>
+         <field name="view_id" ref="perproduct_priceclass_tree_view"/>
+         <field name="help" type="html">
+             <p class="oe_view_nocontent_create">Click to add a new Price Class.</p>
+             <p>
+                You must define a Price Class to hold price lists.
+             </p>
+         </field>
+    </record>
+
+
+      <!-- We add a submenu for the conversion class-->
+      <menuitem
+      id="perproduct_priceclass"
+      name="Product Price Classes"
+      action="perproduct_priceclass_form_action"
+      parent="Per Product UOM.per_product_menu"
+      />
+
+      <!-- We add a submenu for the Product specific UoM entries-->
+      <menuitem
+      id="perproduct_pricelist"
+      name="Price Lists"
+      action="perproduct_pricelist_form_action"
+      parent="Per Product UOM.per_product_menu"
+      />
+
+     <!-- This overrides the product template we'd see when configuring a product.  We've
+          added an entry for our Price class-->
+     <record id="product_template_form_view_inherit_product_uomconv" model="ir.ui.view">
+            <field name="name">product.template.common.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                 <field name="uom_class" position="after" >
+                     <!-- calcislocaluom and calcatidname are stored computed fields.  The fields help establish a dynamic domain that can be loaded without onchange -->
+                     <field name="price_class" options="{'no_create' : True},{'no_create_edit' : True}"  />
+                </field>
+            </field>
+     </record>
+
+
+</data>
+</openerp>

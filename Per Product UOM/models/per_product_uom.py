@@ -1,21 +1,18 @@
 # -*- coding: utf-8 -*-
-from openerp import api, models, fields
-from openerp.exceptions import Warning
-import openerp.addons.decimal_precision as dp
+from odoo import api, models, fields
 
-import openerp.addons.product.product as native_product
-from lxml import etree
 
 class local_product_uom(models.Model):
     _inherits = {'product.uom':'uid', }
     _name = "localproduct.uom"
-    uid = fields.Many2one('product.uom', ondelete='cascade', required=True)
+    uid = fields.Many2one('product.uom', ondelete='cascade', index=True, required=True)
     #This references the conversion class this product belongs to
-    localcategory_id = fields.Many2one('productuom.class', 'Unit of Measure Conversion Class', required=True, ondelete='cascade', help="Conversion between Units of Measure can only occur if they belong to the same category. The conversion will be made based on the ratios.")
+    localcategory_id = fields.Many2one('productuom.class', 'Unit of Measure Conversion Class', required=True, index=True, ondelete='cascade', help="Conversion between Units of Measure can only occur if they belong to the same category. The conversion will be made based on the ratios.")
 
     #We need to delete the corresponding records in product.uom. overriding unlink() lets us do that.
     @api.multi
     def unlink(self):
+        self.uid.islocaluom = False
         self.uid.unlink()
         return super(local_product_uom, self).unlink()
 
@@ -24,11 +21,12 @@ class local_product_uom(models.Model):
     def onchange_localcategory_id(self):
         self.category_id = self.localcategory_id.catid
 
-    def onchange_type(self, cursor, user, ids, value):
-        if value == 'reference':
-            return {'value': {'factor': 1, 'factor_inv': 1}}
-        return {}
-
+    #The onchange action needs to be re-declared here.  Onchange functions are not inherited from the parent class
+    @api.onchange('uom_type')
+    def onchange_uom_type(self):
+        if self.uom_type == 'reference':
+            self.factor = float(1)
+            self.factor_inv = float(1)
 
 
 
@@ -54,13 +52,15 @@ class overloaduom_category(models.Model):
 class product_uom_class(models.Model):
     _inherits = {'product.uom.categ':'catid'}
     _name = 'productuom.class'
-    catid = fields.Many2one('product.uom.categ', ondelete='cascade', required=True)
+    catid = fields.Many2one('product.uom.categ', ondelete='cascade', index=True, required=True)
     #this lets us reference our product specific UoMs from the conversion class.
-    localuom = fields.One2many('localproduct.uom', 'localcategory_id', 'Per Product Unit of Measure', ondelete='restrict',required=False, help="Unit of Measure used for this products stock operation.")
+    localuom = fields.One2many('localproduct.uom', 'localcategory_id', 'Per Product Unit of Measure',index=True, ondelete='restrict',required=False, help="Unit of Measure used for this products stock operation.")
 
     @api.multi
     def unlink(self):
-        self.catid.unlink()
+        for x in range(len()):
+            self.catid.isuomclass = False
+            self.catid.unlink()
         return super(product_uom_class, self).unlink()
 
 
@@ -98,12 +98,15 @@ class ProductTemplate(models.Model):
     #When uom_class is changed, we need to set the uom_id and uom_po_id domain so that only uom's from our uom_class can be selected
     @api.onchange('uom_class')
     def onchange_uom_class(self):
-
+        #IF we don't have a per product UOM class, then we need to default to regular UOM categories.
+        #Here we set the domain to exclude our per product UOMs
         if (self.uom_class.catid.isuomclass == False):
             result = {'domain': {'uom_id': [('islocaluom', '=', False)], 'uom_po_id': [('islocaluom', '=', False)]}}
             self.uom_id = False
             self.uom_po_id = False
 
+        #IF we have a UOM class, then we need to restrict our per product uom class.
+        #Here we set the domain to only allow the selection of the proper per product uoms
         else:
             result = { 'domain':{'uom_id':[('islocaluom','=',True),('category_id.name','=',self.uom_class.name)],'uom_po_id':[('islocaluom','=',True),('category_id.name','=',self.uom_class.name)]}}
             records = self.env['product.uom'].search([('category_id.name','=',self.uom_class.name),('name','=',self.uom_id.name)],limit=1)

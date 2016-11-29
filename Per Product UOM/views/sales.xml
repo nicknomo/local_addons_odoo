@@ -16,7 +16,7 @@
                 </xpath>
 
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom']" position="replace">
-                    <field name="product_uom" domain="[('category_id', '=', relcatid)]" attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}" context="{'company_id': parent.company_id}" groups="product.group_uom" options='{"no_open": True}'/>
+                    <field name="product_uom" domain="[('category_id', '=', relcatid)]" attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}" context="{'company_id': parent.company_id}" groups="product.group_uom" options="{'no_create' : True},{'no_create_edit' : True}"/>
                 </xpath>
             </field>
      </record>
