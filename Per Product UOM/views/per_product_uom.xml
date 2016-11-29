@@ -46,7 +46,7 @@
                         <field name="category_id" invisible="1" domain="[('isuomclass','=',True)]" attrs="{'required': False}"/>
                         <!--This is the field for the UoM conversion class-->
                         <field name="localcategory_id" options="{'no_create' : True},{'no_create_edit' : True}" />
-                        <field name="uom_type" on_change="onchange_type(uom_type)"/>
+                        <field name="uom_type"/>
                         <field name="factor"
                                 digits="[42,5]"
                                 attrs="{'invisible':[('uom_type','!=','smaller')],
@@ -142,10 +142,10 @@
     </record>
 
 
-      <!-- Here we create our root menu for our module-->
+ <!-- Here we create our root menu for our module-->
     <menuitem
-      id="per_product_uom_menu"
-      name="Product UOM Convserion"
+      id="per_product_menu"
+      name="Per Product Mod"
       parent=""
       />
 
@@ -154,7 +154,7 @@
       id="per_product_uom_class"
       name="Product UOM Class"
       action="productuom_class_form_action"
-      parent="per_product_uom_menu"
+      parent="per_product_menu"
       />
 
       <!-- We add a submenu for the Product specific UoM entries-->
@@ -162,7 +162,7 @@
       id="localproduct_uom_entries"
       name="Local UOM Entries"
       action="localproduct_uom_form_action"
-      parent="per_product_uom_menu"
+      parent="per_product_menu"
       />
 
       <!-- This is in case we need to change what is displayed within the view of product.uom
@@ -208,6 +208,18 @@
         <field name="action" ref="product_uom_categ_form_action"/>
     </record>
 
+    <!-- Here we override the UoM category menu in Sales, and use our newly created action that
+         filters our custom categories (see directly above this comment)-->
+    <record model="ir.ui.menu" id="sale.menu_product_uom_categ_form_action">
+        <field name="action" ref="product_uom_categ_form_action"/>
+    </record>
+
+    <!-- Here we override the UoM category menu in Purchasing, and use our newly created action that
+         filters our custom categories (see directly above this comment)-->
+    <record model="ir.ui.menu" id="purchase.menu_purchase_uom_categ_form_action">
+        <field name="action" ref="product_uom_categ_form_action"/>
+    </record>
+
 
      <!-- This is a custom action window.  We will use this when overriding the default/normal UoM menus.
           It prevents our product specific UoM's from showing up in the list view-->
@@ -221,7 +233,13 @@
 
      <!-- Here we override the UoM menu in Sales, and use our newly created action that
          filters our product specific UoMs (see directly above this comment)-->
-     <record model="ir.ui.menu" id="product.menu_product_uom_form_action">
+     <record model="ir.ui.menu" id="sale.menu_product_uom_form_action">
+        <field name="action" ref="uom_list_action_override"/>
+    </record>
+
+     <!-- Here we override the UoM menu in Purchasing, and use our newly created action that
+         filters our product specific UoMs (see directly above this comment)-->
+     <record model="ir.ui.menu" id="purchase.menu_purchase_uom_form_action">
         <field name="action" ref="uom_list_action_override"/>
     </record>
 
