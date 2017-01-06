@@ -6,7 +6,8 @@
     'version': '10.1.0',
     'author': 'Nick Ross (CTC corp) - nick (at) theserverexpert (dot) com',
     'website': 'https://github.com/nicknomo/local_addons_odoo',
-    'license': 'Creative Commons: Attribution-NonCommercial-ShareAlike 4.0 International',
+    'license': 'Other OSI approved licence',
+    #'license': 'Creative Commons: Attribution-NonCommercial-ShareAlike 4.0 International',
     # Clarification of NonCommercial: Commercial entities may use this module in Odoo for generating profit,
     # as long as they do not redistribute it.  It cannot be resold, or repackaged in any way.  It cannot be
     # provided as part of a software as a service, nor can it be included in any publicly distributed Odoo builds.
