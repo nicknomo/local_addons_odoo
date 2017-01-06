@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Sell with Pricing by varied UoM',
+    'name': 'Sell with Pricing by varied UoM / Flooring Sales',
     'summary': 'Each product can be assigned its own UoM class',
-    'category': 'Warehouse',
+    'category': 'Sales',
     'version': '10.1.0',
     'author': 'Nick Ross (CTC corp) - nick (at) theserverexpert (dot) com',
     'website': 'https://github.com/nicknomo/local_addons_odoo',
