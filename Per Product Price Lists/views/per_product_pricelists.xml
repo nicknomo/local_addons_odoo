@@ -136,7 +136,7 @@
             <field name="arch" type="xml">
                  <field name="uom_class" position="after" >
                      <!-- calcislocaluom and calcatidname are stored computed fields.  The fields help establish a dynamic domain that can be loaded without onchange -->
-                     <field name="price_class" options="{'no_create' : True},{'no_create_edit' : True}"  />
+                     <field name="price_class" options="{'no_create' : True},{'no_create_edit' : True},{'no_open' : True}"  />
                 </field>
             </field>
      </record>
