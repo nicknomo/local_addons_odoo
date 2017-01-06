@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Dancik Product IMPORT',
+    'name': 'Sell with Pricing by varied UoM',
     'summary': 'Each product can be assigned its own UoM class',
     'category': 'Warehouse',
     'version': '10.1.0',
@@ -13,6 +13,6 @@
     # If you wish to include this module in an Odoo package, distribution or SaaS deployment, please contact me first.
     # Depending on the usage, I may license it cheaply or for no cost.
     # All entities using their own instance of Odoo, in the course of their business, are free to use this product
-    'depends': ['product','sale','purchase','stock','Per Product Price Lists','Per Product UOM'],
-    'data': [],
+    'depends': ['product','sale','stock','purchase','Per Product UOM'],
+    'data': ['views/sales.xml'],
 }

@@ -45,7 +45,7 @@
                             is automatically populated-->
                         <field name="category_id" invisible="1" domain="[('isuomclass','=',True)]" attrs="{'required': False}"/>
                         <!--This is the field for the UoM conversion class-->
-                        <field name="localcategory_id" options="{'no_create' : True},{'no_create_edit' : True}" />
+                        <field name="localcategory_id" options="{'no_open' : True}, {'no_create' : True},{'no_create_edit' : True}" />
                         <field name="uom_type"/>
                         <field name="factor"
                                 digits="[42,5]"
@@ -268,13 +268,13 @@
                     <!-- This domain is black voodoo magic.  The category_id.name is really only used to filter when islocaluom=True. This is a dirty hack.
                         The result is that if a uom_class is used, only uom's from that class can be selected.  Otherwise, the default uom's are present -->
 
-                    <field name="uom_id" groups="product.group_uom" domain="['&amp;',('islocaluom','=',calcislocaluom),'|',('islocaluom','=',False),('category_id','=',calccatidname)]" options="{'no_create' : True},{'no_create_edit' : True}" />
+                    <field name="uom_id" groups="product.group_uom" domain="['&amp;',('islocaluom','=',calcislocaluom),'|',('islocaluom','=',False),('category_id','=',calccatidname)]" options="{'no_create' : True},{'no_create_edit' : True},{'no_open' : True}" />
                 </field>
 
                 <field name="uom_po_id" position="replace">
                     <!-- This domain is black voodoo magic.  The category_id.name is really only used to filter when islocaluom=True. This is a dirty hack.
                         The result is that if a uom_class is used, only uom's from that class can be selected.  Otherwise, the default uom's are present -->
-                    <field name="uom_po_id" groups="product.group_uom" domain="['&amp;',('islocaluom','=',calcislocaluom),'|',('islocaluom','=',False),('category_id','=',calccatidname)]" options="{'no_create' : True},{'no_create_edit' : True}" />
+                    <field name="uom_po_id" groups="product.group_uom" domain="['&amp;',('islocaluom','=',calcislocaluom),'|',('islocaluom','=',False),('category_id','=',calccatidname)]" options="{'no_create' : True},{'no_create_edit' : True},{'no_open' : True}" />
                 </field>
 
             </field>

@@ -206,17 +206,25 @@ class Productimport(models.Model):
                 'standard_price': convcost, 'uom_id': saleuomrecord.uid.id,
                 'uom_po_id': saleuomrecord.uid.id,}
 
-        records = self.env['product.template'].search([('name', '=', product.name)], limit=1)
+        records = self.env['product.product'].search([('name', '=', product.name)], limit=1)
 
 
         if records:
             print("Found ",product.name)
             newproduct = records[0]
             newproduct.write(vals)
+            newtemplate = newproduct.product_tmpl_id
+            tempvals = {'standard_price': convcost,}
+            newtemplate.write(tempvals)
 
         else:
             print("Creating ",product.name)
-            newproduct = self.env['product.template'].create(vals)
+            tempvals = {'name': product.name,}
+            newproduct = self.env['product.product'].create(tempvals)
+            newproduct.write(vals)
+            newtemplate = newproduct.product_tmpl_id
+            tempvals2 = {'standard_price': convcost,}
+            newtemplate.write(tempvals2)
 
 
 

@@ -123,42 +123,5 @@ class ProductTemplate(models.Model):
 
         return result
 
-    #field_view_get returns the view.  This was a dead end solution for the dynamic domain problem, but the code remains in case it might be useful.
-
-    """@api.model
-    def fields_view_get(self, view_id=None, view_type=None, context=None, toolbar=False, submenu=False):
-
-        res = super(ProductTemplate, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
-
-        if view_type == 'form':
-            doc = etree.XML(res['arch'])
-
-            the_uomids = doc.xpath("//field[@name='uom_id']")
-            the_uomid = the_uomids[0] if the_uomids \
-                else False
-
-            the_uompoids = doc.xpath("//field[@name='uom_po_id']")
-            the_uompoid = the_uompoids[0] if the_uompoids \
-                else False
-
-            obj = self.env['product.template']
-            active_id = self.env.context.get('active_id', False)
-            print active_id
-            print context
-            print self.env
-            uom_class=obj.browse(active_id).uom_class
-            if uom_class:
-                print uom_class.name
-            else:
-                print "nothing found"
-
-
-            print res['fields']['uom_id']
-            the_uomid.set('domain',self.test)
-            res['arch'] = etree.tostring(doc)
-        # your modification in the view
-        # result['fields'] will give you the fields. modify it if needed
-        # result['arch'] will give you the xml architecture. modify it if needed
-        return res"""
 
 
