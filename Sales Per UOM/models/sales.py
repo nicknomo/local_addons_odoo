@@ -92,6 +92,7 @@ class NewSaleOrder(models.Model):
             convfactor = float(float(salefactor) / float(pricefactor))
             convprice = float(float(price) * float(convfactor))
             convprice = round(convprice, 2)
+            self.quoteuserprice = convprice
             self.quoteuomprice= '' + str(convprice) + ' / ' + newuom.name
             return {}
 
