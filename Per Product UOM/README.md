@@ -30,4 +30,4 @@
 # Known Issues
    
    An issue with Odoo prevents this module from properly removing this modules data.  If you intend to uninstall this module, I recommend you delete all UoM Classes first.  If this is not done, and you reinstall the module, then you will not be able to create records for any objects that were in the database before the module was removed.  
-
+     
