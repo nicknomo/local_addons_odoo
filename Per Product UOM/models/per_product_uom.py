@@ -12,8 +12,9 @@ class local_product_uom(models.Model):
     #We need to delete the corresponding records in product.uom. overriding unlink() lets us do that.
     @api.multi
     def unlink(self):
-        self.uid.islocaluom = False
-        self.uid.unlink()
+        for x in range(len()):
+            self.uid.islocaluom = False
+            self.uid.unlink()
         return super(local_product_uom, self).unlink()
 
     #Here we automatically compute the normal UoM category, base on the conversion class.  The normal UoM category is part of the conversion class, so its easy to reference.
