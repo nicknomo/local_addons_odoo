@@ -48,54 +48,11 @@ class NewSaleOrder(models.Model):
 
         if (product.uom_id):
             vals = {}
-            #self.quoteproductuom = product.uom_id
+            self.quoteproductuom = product.uom_id
             self.quotesaleuomcat = self.quoteproduct.uom_id.category_id.id
             domain = {'quoteproductuom': [('category_id', '=', self.quotesaleuomcat)]}
             vals['quoteproductuom'] = self.quoteproduct.uom_id
             self.update(vals)
-
-            priceclass = self.quoteproduct.price_class
-            pricelistrecords = priceclass.pricelists
-
-            if pricelistrecords:
-                hasLL = False
-
-                for z in range(len(pricelistrecords)):
-                    if not hasLL:
-                        if (pricelistrecords[z].name == "LL"):
-                            hasLL = True
-                            LLrecord = pricelistrecords[z]
-                            if (hasLL): break
-
-                if hasLL:
-                    unitprice = LLrecord.uomname
-                    packageclass = self.quoteproduct.uom_class
-                    uomrecords = packageclass.localuom
-
-                    if uomrecords:
-                        hasunitprice = False
-
-                        for y in range(len(uomrecords)):
-                            if not hasunitprice:
-                                if (uomrecords[y].name == unitprice):
-                                    hasunitprice = True
-                                    priceuomrecord = uomrecords[y]
-                                    if (hasunitprice): break
-
-                        if hasunitprice:
-                            self.quoteproductuom = priceuomrecord.uid
-
-                        else: self.quoteproductuom = product.uom_id
-
-                    else: self.quoteproductuom = product.uom_id
-
-
-                else:
-                    self.quoteproductuom = product.uom_id
-
-            else:
-                self.quoteproductuom = product.uom_id
-
             return {'domain': domain}
 
         return {}
@@ -197,9 +154,6 @@ class NewSaleOrder(models.Model):
             convfactor = float(float(salefactor) / float(qtyfactor))
             convqty = float(float(qty) * float(convfactor))
             convqty = round(convqty, 2)
-            import math
-            suggestedqty = math.ceil(convqty)
-            self.quotesaleqty = int(suggestedqty)
             self.quoteexactuomqty= str(convqty) + " " + uom.name
             return {}
 
@@ -226,11 +180,6 @@ class NewSaleOrder(models.Model):
                 pricefactor = newuom.factor
 
             if (pricefactor == 0):
-                self.quoteuomprice = 'Div By 0'
-                return {}
-
-            if (pricefactor == 0):
-                self.quoteuomprice = 'Div By 0'
                 return {}
 
             convfactor = float(float(salefactor) / float(pricefactor))
@@ -263,11 +212,6 @@ class NewSaleOrder(models.Model):
                 pricefactor = newuom.factor
 
             if (pricefactor == 0):
-                self.quoteuomprice = 'Div By 0'
-                return {}
-
-            if (pricefactor == 0):
-                self.quoteuomprice = 'Div By 0'
                 return {}
 
             convfactor = float(float(salefactor) / float(pricefactor))
@@ -284,8 +228,10 @@ class NewSaleOrder(models.Model):
 
     @api.multi
     def newlinecreate(self):
-
         if not (self.quoteproduct and self.quotesaleqty and self.quoteproductuom and self.quoteactualprice):
+            return
+
+        if (self.quotesaleqty < 1) or (self.quoteactualprice < .01):
             return
 
         if not (self.quoteproduct.description):
@@ -293,11 +239,12 @@ class NewSaleOrder(models.Model):
         else:
             description = self.quoteproduct.description
 
-
-        vals = {'order_id': self.id, 'name': description, 'price_unit': self.quoteactualprice, 'product_id': self.quoteproduct.id, 'product_uom_qty': self.quotesaleqty, 'product_uom': self.quoteproduct.uom_id.id}
+        vals = {'order_id': self.id, 'name': description, 'price_unit': self.quoteactualprice,
+                'product_id': self.quoteproduct.id, 'product_uom_qty': self.quotesaleqty,
+                'product_uom': self.quoteproduct.uom_id.id}
         newline = self.env['sale.order.line'].create(vals)
         newline.product_id_change()
-        tempvals = { 'price_unit': self.quoteactualprice, }
+        tempvals = {'price_unit': self.quoteactualprice,}
         newline.write(tempvals)
         self.quoteproduct = False
 
