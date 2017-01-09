@@ -50,7 +50,7 @@ class NewSaleOrder(models.Model):
             vals = {}
             self.quoteproductuom = product.uom_id
             self.quotesaleuomcat = self.quoteproduct.uom_id.category_id.id
-            domain = {'quoteproductuom': [('category_id', '=', 1925)]}
+            domain = {'quoteproductuom': [('category_id', '=', self.quotesaleuomcat)]}
             vals['quoteproductuom'] = self.quoteproduct.uom_id
             self.update(vals)
             return {'domain': domain}
