@@ -48,11 +48,54 @@ class NewSaleOrder(models.Model):
 
         if (product.uom_id):
             vals = {}
-            self.quoteproductuom = product.uom_id
+            #self.quoteproductuom = product.uom_id
             self.quotesaleuomcat = self.quoteproduct.uom_id.category_id.id
             domain = {'quoteproductuom': [('category_id', '=', self.quotesaleuomcat)]}
             vals['quoteproductuom'] = self.quoteproduct.uom_id
             self.update(vals)
+
+            priceclass = self.quoteproduct.price_class
+            pricelistrecords = priceclass.pricelists
+
+            if pricelistrecords:
+                hasLL = False
+
+                for z in range(len(pricelistrecords)):
+                    if not hasLL:
+                        if (pricelistrecords[z].name == "LL"):
+                            hasLL = True
+                            LLrecord = pricelistrecords[z]
+                            if (hasLL): break
+
+                if hasLL:
+                    unitprice = LLrecord.uomname
+                    packageclass = self.quoteproduct.uom_class
+                    uomrecords = packageclass.localuom
+
+                    if uomrecords:
+                        hasunitprice = False
+
+                        for y in range(len(uomrecords)):
+                            if not hasunitprice:
+                                if (uomrecords[y].name == unitprice):
+                                    hasunitprice = True
+                                    priceuomrecord = uomrecords[y]
+                                    if (hasunitprice): break
+
+                        if hasunitprice:
+                            self.quoteproductuom = priceuomrecord.uid
+
+                        else: self.quoteproductuom = product.uom_id
+
+                    else: self.quoteproductuom = product.uom_id
+
+
+                else:
+                    self.quoteproductuom = product.uom_id
+
+            else:
+                self.quoteproductuom = product.uom_id
+
             return {'domain': domain}
 
         return {}
@@ -117,7 +160,7 @@ class NewSaleOrder(models.Model):
                 pricefactor = newuom.factor
 
             if (pricefactor == 0):
-                self.quoteuomprice = 'Div By 0'
+                self.quoteuomcost = 'Div By 0'
                 return {}
 
             convfactor = float(float(salefactor) / float(pricefactor))
@@ -143,18 +186,21 @@ class NewSaleOrder(models.Model):
                 salefactor = uom.factor
 
             if (newuom.uom_type == 'bigger'):
-                pricefactor = newuom.factor_inv
+                qtyfactor = newuom.factor_inv
             else:
-                pricefactor = newuom.factor
+                qtyfactor = newuom.factor
 
-            if (pricefactor == 0):
-                self.quoteuomprice = 'Div By 0'
+            if (qtyfactor == 0):
+                self.quoteexactuomqty = 'Div By 0'
                 return {}
 
-            convfactor = float(float(salefactor) / float(pricefactor))
-            convprice = float(float(qty) * float(convfactor))
-            convprice = round(convprice, 2)
-            self.quoteexactuomqty= str(convprice) + " " + uom.name
+            convfactor = float(float(salefactor) / float(qtyfactor))
+            convqty = float(float(qty) * float(convfactor))
+            convqty = round(convqty, 2)
+            import math
+            suggestedqty = math.ceil(convqty)
+            self.quotesaleqty = int(suggestedqty)
+            self.quoteexactuomqty= str(convqty) + " " + uom.name
             return {}
 
         self.quoteexactuomqty = 'N/A'
