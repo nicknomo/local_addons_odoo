@@ -37,7 +37,7 @@ class NewSaleOrder(models.Model):
 
 
         if not self.quoteproduct:
-            self.quoteqty = False
+            self.quoteqty = 1
             self.quoteproductuom = False
             self.quoteuserprice = False
             self.quotesaleqty = False
@@ -48,6 +48,7 @@ class NewSaleOrder(models.Model):
 
         if (product.uom_id):
             vals = {}
+            self.quoteqty = 1
             self.quoteproductuom = product.uom_id
             self.quotesaleuomcat = self.quoteproduct.uom_id.category_id.id
             domain = {'quoteproductuom': [('category_id', '=', self.quotesaleuomcat)]}
