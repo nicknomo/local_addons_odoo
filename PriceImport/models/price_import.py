@@ -121,7 +121,8 @@ class Priceimport(models.Model):
 
     def readfile(self):
         print("Opening file")
-        book = xlrd.open_workbook('C:/pricefile.xlsx')
+        filename = '/var/tmp/pricefile.xlsx'
+        book = xlrd.open_workbook(filename)
         sheet = book.sheet_by_index(0)
         print("First Row")
         row0 = sheet.row(0)
@@ -166,6 +167,22 @@ class Priceimport(models.Model):
             #print("X out of the loop: ", x)
             x=x+1
             self.createodoorecords(priceclass, allpricelists)
+
+        filenameold = "/var/tmp/pricefile.old"
+        try:
+            os.remove(filenameold)
+        except OSError:
+            print("Can't Delete for unknown reason")
+            pass
+
+        try:
+            os.rename(filename, filenameold)
+        except OSError:
+            print("Can't rename")
+            pass
+
+
+
 
 
 
