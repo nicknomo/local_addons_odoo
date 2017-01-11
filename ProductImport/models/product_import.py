@@ -228,14 +228,10 @@ class Productimport(models.Model):
 
 
 
-
-
-
-
-
     def readfile(self):
         print("Opening file")
-        book = xlrd.open_workbook('C:/itemfile.xlsx')
+        filename='/var/tmp/itemfile.xlsx'
+        book = xlrd.open_workbook(filename)
         sheet = book.sheet_by_index(0)
         print("First Row")
         row0 = sheet.row(0)
@@ -275,6 +271,23 @@ class Productimport(models.Model):
             #tempproduct.printall()
 
             self.createodoorecords(tempproduct)
+
+        filenameold = "/var/tmp/itemfile.old"
+        try:
+            os.remove(filenameold)
+        except OSError:
+            print("Can't Delete for unknown reason")
+            pass
+
+        try:
+            os.rename(filename, filenameold)
+        except OSError:
+            print("Can't rename")
+            pass
+
+
+
+
 
 
 

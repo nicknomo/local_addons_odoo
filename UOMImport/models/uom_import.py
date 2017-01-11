@@ -347,7 +347,8 @@ class UOMimport(models.Model):
 
 
     def readfile(self):
-        book = xlrd.open_workbook('C:/test.xls')
+        filename='/var/tmp/package.xls'
+        book = xlrd.open_workbook(filename)
         sheet = book.sheet_by_index(0)
 
         row0 = sheet.row(0)
@@ -414,6 +415,21 @@ class UOMimport(models.Model):
                 factors.append(factor)
 
             self.processline(packageclass, um1, um2, factors)
+
+        filenameold = "/var/tmp/package.old"
+        try:
+            os.remove(filenameold)
+        except OSError:
+            print("Can't Delete for unknown reason")
+            pass
+
+        try:
+            os.rename(filename, filenameold)
+        except OSError:
+            print("Can't rename")
+            pass
+
+
 
 
 
