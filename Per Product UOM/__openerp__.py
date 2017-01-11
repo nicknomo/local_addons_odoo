@@ -15,5 +15,5 @@
     # Depending on the usage, I may license it cheaply or for no cost.
     # All entities using their own instance of Odoo, in the course of their business, are free to use this product
     'depends': ['product','sale','stock','purchase'],
-    'data': ['views/per_product_uom.xml','views/sales.xml','views/purchase.xml'],
+    'data': ['views/per_product_uom.xml','views/sales.xml','views/purchase.xml','security/ir.model.access.csv'],
 }
