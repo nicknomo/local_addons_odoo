@@ -8,7 +8,7 @@
 
 # Installation
 
-   Please ensure you've configured a location for Odoo to locally load apps.  Copy this folder into there. Go to your odoo web interface, and go into the Apps tab. Click on "Update module list". Then search for "Sales Per UoM" within your App list, and then install.
+   Please ensure you've configured a location for Odoo to locally load apps.  Copy this folder into there. Go to your odoo web interface, and go into the Apps tab. Click on "Update module list". Then search for "Sell with Pricing by varied UoM / Flooring Sales" within your App list, and then install.
 
 # Prerequisites
 
