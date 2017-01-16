@@ -249,6 +249,19 @@ class NewSaleOrder(models.Model):
         newline.write(tempvals)
         self.quoteproduct = False
 
+    @api.multi
+    def clearall(self):
+        self.quoteproduct = False
+        self.quoteqty = 1
+        self.quoteproductuom = False
+        self.quoteuserprice = False
+        self.quotesaleqty = False
+        self.quotesaleuomcat = 1
+        return {}
+
+
+
+
 
 
 

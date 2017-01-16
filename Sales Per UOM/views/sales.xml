@@ -39,6 +39,7 @@
                     <group>
                         <div class="oe_edit_only">
                             <button type="object" name="newlinecreate" class="oe_form_buttons_view" string="Add Line"/>
+                            <button colspan="1" type="object" name="clearall" class="oe_form_buttons_view" string="Clear"/>
                         </div>
                         <field name="quotesaleuomcat" invisible="1" />
                     </group>
